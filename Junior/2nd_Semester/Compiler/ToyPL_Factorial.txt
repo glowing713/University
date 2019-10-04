@@ -1,0 +1,35 @@
+program <Fact_iterative>
+	func Fact (n : int) returns (int)
+	    var result : int;
+	    begin
+		result = 1;
+		while(n > 0)
+		    begin
+			result = result * n;
+			n = n - 1;
+		    end;
+		return result;
+	    end;
+	main
+	var a : int;
+	begin
+	   a = 10;
+	   return Fact(a);
+	end;
+
+
+
+program Fact_recursion
+	func Fact (n : int) returns (int)
+	    var m, result : int;
+	    begin
+		if(n = 1) then return 1;
+		m = n - 1;
+		return n * Fact(m);
+	    end;
+	main
+	var a, b : int;
+	begin
+	   a = 10;
+	   return Fact(a);
+	end;

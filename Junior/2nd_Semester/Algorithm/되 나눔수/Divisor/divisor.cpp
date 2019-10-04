@@ -40,8 +40,8 @@ int main(void){
     ofstream ofs;
     int num = 0, a = 0, b = 0, count = 0;  // 경우의 수 , 입력될 숫자 a와 b
     
-    ifs.open("/Users/leesunhwan/Downloads/Coding/Xcode/Github_Upload/Junior/2nd_Semester/Algorithm/Divisor/Divisor/divisor.inp.txt");
-    ofs.open("/Users/leesunhwan/Downloads/Coding/Xcode/Github_Upload/Junior/2nd_Semester/Algorithm/Divisor/Divisor/divisor.out.txt");
+    ifs.open("divisor.inp");
+    ofs.open("divisor.out");
     
     ifs >> num;     // 총 케이스 수 read
     if(num < 0 || num > 50){    // 오류 체크
