@@ -1,5 +1,6 @@
 > ## Junior course
   
+
 **2019 1st semester**  
 
 Numerical_Analysis (Python)
@@ -7,6 +8,7 @@ Numerical_Analysis (Python)
 Operating_System(C++)
 
 Programming_Language(C++)
+
 
 
 **2019 2nd semester**  
@@ -17,6 +19,8 @@ Compiler(C)
 
 Software_Engineering(App Dev)
 
-C++_Programming
+C++_Programming(C++)
+
+Embedded_Programming(Arduino)
 
 Network_2
