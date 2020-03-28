@@ -3,7 +3,7 @@
 <br>
 **2020 1st semester**  
 
-Artificial_Intelligence (Python, Tensorflow)
+Artificial_Intelligence (Python, Tensorflow, Keras)
 
 Computer_Graphics (C++, OpenGL)
 
