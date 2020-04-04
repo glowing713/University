@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[12]:
+# In[10]:
 
 
 # 경사하강법에 의한 2차 함수의 최소화
@@ -120,8 +120,80 @@ with tf.Session() as sess:
     pred_ = sess.run(pred, feed_dict={x:x_test})
 
 
-# In[ ]:
+# In[11]:
 
 
+import numpy as np
+
+def get_batches(x, y, batch_size):
+    n_data = len(x)
+    indices = np.arange(n_data)
+    np.random.shuffle(indices)
+    x_shuffled = x[indices]
+    y_shuffled = y[indices]
+    
+    # 원본 데이터에서 무작위로 batch_size 개수 만큼 데이터 추출
+    for i in range(0, n_data, batch_size):
+        x_batch = x_shuffled[i: i + batch_size]
+        y_batch = y_shuffled[i: i + batch_size]
+        yield x_batch, y_batch
 
 
+# In[12]:
+
+
+# minibatch 크기
+BATCH_SIZE = 32
+
+step = 0
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    # 100 Epoch 회 반복
+    for epoch in range(100):
+        for x_batch, y_batch in get_batches(x_train, y_train, 32):
+            train_loss, _ = sess.run(
+                [loss, train_step],
+                feed_dict = {
+                    x: x_batch,
+                    y: y_batch.reshape((-1, 1))
+                }
+            )
+            print('step: {}, train_loss: {}'.format(
+                step, train_loss
+            ))
+            step += 1
+            
+    pred_ = sess.run(
+        pred,
+        feed_dict = {
+            x: x_test
+        }
+    )
+
+
+# In[14]:
+
+
+BATCH_SIZE = 32
+step = 0
+loss_list = []
+step_list = []
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    for epoch in range(100):
+        for x_batch, y_batch in get_batches(x_train, y_train, 32):
+            train_loss, _ = sess.run([loss, train_step],
+                                    feed_dict = {x: x_batch, y: y_batch.reshape((-1, 1))})
+            loss_list.append(train_loss)
+            step_list.append(step)
+            step += 1
+            
+    pred_ = sess.run(pred, feed_dict = {x: x_test})
+    
+import matplotlib.pyplot as plt
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.size'] = 10*3
+plt.rcParams['figure.figsize'] = [18, 12]
+plt.plot(step_list, loss_list)
+plt.xlabel('step')
+plt.ylabel('train loss')
