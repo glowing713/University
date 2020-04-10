@@ -4,20 +4,17 @@
 using namespace std;
 
 
-typedef struct PROCESS {
+typedef struct _PROCESS {
     int pid;
     long arrTime;
     long bstTime;
-    long cplTime;
     long wtgTime;
 }PROCESS;
 
 
 PROCESS fcfsArr[60];
-PROCESS inpPCS;
+PROCESS inpPCS; // 입력데이터의 프로세스 정보를 저장하기 위한 구조체 변수
 int pcsCnt = 0;   // 입력으로 들어오는 프로세스 개수
-long timeEdge = 0;   // cpu 스케줄링 하면서 현재 시간을 기록
-long wtgSum = 0; // waiting time의 총합
 
 
 
@@ -33,41 +30,30 @@ bool Compare(PROCESS p1, PROCESS p2) {
 
 
 void FCFSscheduling() {
-    // 첫 번째 프로세스의 완료시간과 waiting time 설정
-    fcfsArr[0].cplTime = fcfsArr[0].arrTime + fcfsArr[0].bstTime;
+    
+    int k = 0;
+    long bstSum = 0;
     fcfsArr[0].wtgTime = 0;
-    timeEdge = fcfsArr[0].cplTime;
     
-    
-    // 두 번째 프로세스부터 처리시작
     for (int i = 1; i < pcsCnt; ++i) {
         
-        PROCESS* nowProcess = &fcfsArr[i];
+        PROCESS *nowPcs = &fcfsArr[i];
         
-        //        if (nowProcess->arrTime < timeEdge) {
-        //            nowProcess->cplTime = timeEdge + nowProcess->bstTime;
-        //            nowProcess->wtgTime = timeEdge - nowProcess->arrTime;
-        //            timeEdge = nowProcess->cplTime;
-        //        } else if (nowProcess->arrTime == timeEdge) {
-        //            nowProcess->cplTime = nowProcess->arrTime + nowProcess->bstTime;
-        //            nowProcess->wtgTime = 0;
-        //            timeEdge = nowProcess->cplTime;
-        //        } else {
-        //            nowProcess->cplTime = nowProcess->arrTime + nowProcess->bstTime;
-        //            nowProcess->wtgTime = 0;
-        //            timeEdge = nowProcess->cplTime;
-        //        }
-        if (nowProcess->arrTime < timeEdge) {
-            nowProcess->cplTime = timeEdge + nowProcess->bstTime;
-            nowProcess->wtgTime = timeEdge - nowProcess->arrTime;
-            timeEdge = nowProcess->cplTime;
-        } else {
-            nowProcess->cplTime = nowProcess->arrTime + nowProcess->bstTime;
-            nowProcess->wtgTime = 0;
-            timeEdge = nowProcess->cplTime;
+        for (int j = k; j < i; ++j) {
+            PROCESS *tempPcs = &fcfsArr[j];
+            bstSum += tempPcs->bstTime;
         }
         
+        if (bstSum + fcfsArr[k].arrTime > nowPcs->arrTime) {
+            nowPcs->wtgTime = bstSum + fcfsArr[k].arrTime - nowPcs->arrTime;
+        } else {
+            k = i;
+            nowPcs->wtgTime = 0;
+        }
+        
+        bstSum = 0;
     }
+    
 }
 
 
@@ -77,6 +63,8 @@ int main() {
     ofstream ofs;
     ifs.open("fcfs.inp");
     ofs.open("fcfs.out");
+    
+    long wtgSum = 0; // waiting time의 총합
     
     ifs >> pcsCnt;
     
@@ -91,6 +79,10 @@ int main() {
     sort(fcfsArr, fcfsArr + pcsCnt, Compare);
     
     FCFSscheduling();
+    
+//    for (int i = 0; i < pcsCnt; ++i) {
+//        cout << "(" << fcfsArr[i].pid << ", " << fcfsArr[i].arrTime << ", " << fcfsArr[i].bstTime << ", " << fcfsArr[i].wtgTime << ")" << endl;
+//    }
     
     // waiting time의 총합 구하기
     for (int i = 0; i < pcsCnt; ++i) {
