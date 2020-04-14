@@ -6,17 +6,44 @@
 
 //GLboolean IsSphere = true;
 GLchar gWhat = 's';
+GLboolean gSmall = true;
+GLboolean gIsWire = true;
 
 
 void MyDisplay() {
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(0.0, 0.5, 0.5);
-    if (gWhat == 's')
-        glutWireSphere(0.5, 30, 30);
-    else if (gWhat == 't')
-        glutWireTorus(0.1, 0.3, 40, 20);
-    else if (gWhat == 'p')
-        glutWireTeapot(0.5);
+    if (gWhat == 's' && gSmall == true) {
+        if (gIsWire == true)
+            glutWireSphere(0.5, 30, 30);
+        else
+            glutSolidSphere(0.5, 30, 30);
+    }else if (gWhat == 's' && gSmall == false) {
+        if (gIsWire == true)
+            glutWireSphere(0.7, 30, 30);
+        else
+            glutSolidSphere(0.7, 30, 30);
+    }else if (gWhat == 't' && gSmall == true) {
+        if (gIsWire == true)
+            glutWireTorus(0.1, 0.3, 40, 20);
+        else
+            glutSolidTorus(0.1, 0.3, 40, 20);
+    }else if (gWhat == 't' && gSmall == false) {
+        if (gIsWire == true)
+            glutWireTorus(0.2, 0.5, 40, 20);
+        else
+            glutSolidTorus(0.2, 0.5, 40, 20);
+    }else if (gWhat == 'p' && gSmall == true) {
+        if (gIsWire == true)
+            glutWireTeapot(0.5);
+        else
+            glutSolidTeapot(0.5);
+    }else if (gWhat == 'p' && gSmall == false) {
+        if (gIsWire == true)
+            glutWireTeapot(0.7);
+        else
+            glutSolidTeapot(0.7);
+    }
     glFlush();
 }
 
@@ -33,6 +60,18 @@ void MyMainMenu(int entryID) {
     glutPostRedisplay();
 }
 
+void MySizeMenu(int entryID) {
+    if (entryID == 1)    gSmall = true;
+    else if (entryID == 2)  gSmall = false;
+    glutPostRedisplay();
+}
+
+void MyStyleMenu(int entryID) {
+    if (entryID == 1)   gIsWire = true;
+    else if (entryID == 2)  gIsWire = false;
+    glutPostRedisplay();
+}
+
 
 void MyInit() {
     glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -41,10 +80,20 @@ void MyInit() {
     
     glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
     
+    GLint MySizeID = glutCreateMenu(MySizeMenu);
+    glutAddMenuEntry("Small", 1);
+    glutAddMenuEntry("Large", 2);
+    
+    GLint MyStyleID = glutCreateMenu(MyStyleMenu);
+    glutAddMenuEntry("Wire", 1);
+    glutAddMenuEntry("Solid", 2);
+    
     glutCreateMenu(MyMainMenu);
     glutAddMenuEntry("Draw Sphere", 1);
     glutAddMenuEntry("Draw Torus", 2);
     glutAddMenuEntry("Draw Teapot", 3);
+    glutAddSubMenu("Size", MySizeID);
+    glutAddSubMenu("Style", MyStyleID);
     glutAddMenuEntry("Exit", 4);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
