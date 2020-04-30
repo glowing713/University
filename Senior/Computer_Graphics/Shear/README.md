@@ -1,4 +1,4 @@
-## Maximus
+## Maximus with iPhone
 > **GL_POLYGON**, **GL_LINES**, **GL_LINE_LOOP**, **GL_LINE_STRIP**
 
 > **glPushMatrix**, **glPopMatrix**
@@ -11,4 +11,4 @@
 
 > **glKeyboardFunc**, **glSpecialFunc**
 
-![shear](https://github.com/glowthem/University/blob/master/Senior/Computer_Graphics/Shear/shear.gif)
+![shear](https://github.com/glowthem/University/blob/master/Senior/Computer_Graphics/Shear/MaxwithIphone.gif)

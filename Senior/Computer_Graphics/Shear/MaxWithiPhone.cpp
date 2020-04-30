@@ -32,7 +32,7 @@
  F1 F2 F3 : body dance
  F4 F5 F6 : leg dance
  
- -------------------------------------------------------------*/
+ -----------------------------------------------------------*/
 
 #define GL_SILENCE_DEPRECATION
 #include <GLUT/GLUT.h>
@@ -56,6 +56,7 @@ void YourMat();
 void YourFace();
 void YourEyeMouth();
 void YourBody();
+void MyiPhone();
 void MyKeyboard(unsigned char key, int x, int y);
 void MySpecial(int key, int x, int y);
 
@@ -68,16 +69,18 @@ void MyDisplay() {
     
     YourBackground();
     YourMat();
+        
     
+    // 여기서부터 막시무스
     glPushMatrix();
     glTranslatef(gX, gY, 0.0);
-    
     GLfloat Shear_arr[4][4] = {
         {1, 0, 0, 0},
         {gShear, 1, 0, 0},
         {0, 0, 1, 0},
         {0, 0, 0, 1},
     };
+    
     glTranslatef(0.0, -1.0, 0.0);
     glMultMatrixf((float*)Shear_arr);
     glTranslatef(0.0, 1.0, 0.0);
@@ -85,10 +88,73 @@ void MyDisplay() {
     YourEyeMouth();
     YourBody();
     glPopMatrix();
+    // 여기까지 막시무스
+    
+    
+    // 여기서부터 아이폰
+    glPushMatrix();
+    glTranslatef(-2.6, -2.8, 0.0);
+    glMultMatrixf((float*)Shear_arr);
+    glTranslatef(2.6, 2.8, 0.0);
+    MyiPhone();
+    glPopMatrix();
+    // 여기까지 아이폰
     
     glutSwapBuffers();
     
 } // MyDisplay
+
+
+
+void MyiPhone() {
+    glColor3f(1.0, 1.0, 1.0);
+                 
+        glBegin(GL_POLYGON);
+            glVertex3f(-3.0, -2.3, 0.0);
+            glVertex3f(-2.5, -2.3, 0.0);
+            glVertex3f(-2.5, -1.3, 0.0);
+            glVertex3f(-3.0, -1.3, 0.0);
+        glEnd();
+        
+        glColor3f(0.5, 0.5, 0.5);
+        glBegin(GL_POLYGON);
+            glVertex3f(-2.95, -2.25, 0.0);
+            glVertex3f(-2.55, -2.25, 0.0);
+            glVertex3f(-2.55, -1.35, 0.0);
+            glVertex3f(-2.95, -1.35, 0.0);
+        glEnd();
+        
+        glColor3f(0.0, 0.0, 0.0);
+        glBegin(GL_POLYGON);
+            glVertex3f(-2.85, -1.4, 0.0);
+            glVertex3f(-2.65, -1.4, 0.0);
+            glVertex3f(-2.65, -1.35, 0.0);
+            glVertex3f(-2.85, -1.35, 0.0);
+        glEnd();
+    
+    glPushMatrix(); // 다리 두 개 묶음
+    GLfloat Shear_arr[4][4] = {
+        {1, 0, 0, 0},
+        {gShearLeg, 1, 0, 0},
+        {0, 0, 1, 0},
+        {0, 0, 0, 1}
+    };
+    glTranslatef(-3.0, -2.3, 0.0);
+    glMultMatrixf((float*)Shear_arr);
+    glTranslatef(3.0, 2.3, 0.0);
+    
+        glColor3f(0.0, 0.0, 0.0);
+        glBegin(GL_LINES);
+            glVertex3f(-2.85, -2.3, 0.0);
+            glVertex3f(-2.95, -2.8, 0.0);
+        glEnd();
+        glBegin(GL_LINES);
+            glVertex3f(-2.65, -2.3, 0.0);
+            glVertex3f(-2.55, -2.8, 0.0);
+        glEnd();
+    
+    glPopMatrix();
+}
 
 
 void YourBackground(){
@@ -96,31 +162,31 @@ void YourBackground(){
     glColor3f(0, 1, 1); // sky
     
     glBegin(GL_POLYGON);
-    glVertex3f(-4, 0, -4);
-    glVertex3f(4, 0, -4);
-    glVertex3f(4, 3, -4);
-    glVertex3f(-4, 3, -4);
+        glVertex3f(-4, 0, -4);
+        glVertex3f(4, 0, -4);
+        glVertex3f(4, 3, -4);
+        glVertex3f(-4, 3, -4);
     glEnd();
     
     glColor3f(0, 1, 0); // green
     
     glBegin(GL_POLYGON);
-    glVertex3f(-4, -3, -4);
-    glVertex3f(4, -3, -4);
-    glVertex3f(4, 0, -4);
-    glVertex3f(-4, 0, -4);
+        glVertex3f(-4, -3, -4);
+        glVertex3f(4, -3, -4);
+        glVertex3f(4, 0, -4);
+        glVertex3f(-4, 0, -4);
     glEnd();
-    
+
 }
 
 void YourMat() {
     
     glColor3f(0xE4/255.0, 0xBE/255.0, 0xFE/255.0); // 연보라색
     glBegin(GL_POLYGON);
-    glVertex3f(-1.5, -1.3, 0);
-    glVertex3f(1.2, -1.3, 0);
-    glVertex3f(1.5, -0.8, 0);
-    glVertex3f(-1.2, -0.8, 0);
+        glVertex3f(-1.5, -1.3, 0);
+        glVertex3f(1.2, -1.3, 0);
+        glVertex3f(1.5, -0.8, 0);
+        glVertex3f(-1.2, -0.8, 0);
     glEnd();
     
 } // YourMat
@@ -145,17 +211,17 @@ void YourEyeMouth() {
         glColor3f(0, 0, 0); // black
         
         glBegin(GL_LINES);
-        glVertex3f(-0.3, 1.2, 0.0); // eye
-        glVertex3f(-0.1, 1.0, 0.0);
-        glVertex3f(0.1, 1.0, 0.0); // eye
-        glVertex3f(0.3, 1.2, 0.0);
+            glVertex3f(-0.3, 1.2, 0.0); // eye
+            glVertex3f(-0.1, 1.0, 0.0);
+            glVertex3f(0.1, 1.0, 0.0); // eye
+            glVertex3f(0.3, 1.2, 0.0);
         glEnd();
         
         glBegin(GL_LINE_LOOP); // mouth
-        glVertex3f(-0.1, 0.9, 0.0);
-        glVertex3f(0.1, 0.9, 0.0);
-        glVertex3f(0.1, 0.8, 0.0);
-        glVertex3f(-0.1, 0.8, 0.0);
+            glVertex3f(-0.1, 0.9, 0.0);
+            glVertex3f(0.1, 0.9, 0.0);
+            glVertex3f(0.1, 0.8, 0.0);
+            glVertex3f(-0.1, 0.8, 0.0);
         glEnd();
     }
     else if (gFace == 's' ) { // smiling
@@ -163,22 +229,22 @@ void YourEyeMouth() {
         glColor3f(0, 0, 0); // black
         
         glBegin(GL_LINE_STRIP); // eye
-        glVertex3f(-0.3, 1.1, 0.0);
-        glVertex3f(-0.2, 1.15, 0.0);
-        glVertex3f(-0.1, 1.1, 0.0);
+            glVertex3f(-0.3, 1.1, 0.0);
+            glVertex3f(-0.2, 1.15, 0.0);
+            glVertex3f(-0.1, 1.1, 0.0);
         glEnd();
         glBegin(GL_LINE_STRIP);    // eye
-        glVertex3f(0.1, 1.1, 0.0);
-        glVertex3f(0.2, 1.15, 0.0);
-        glVertex3f(0.3, 1.1, 0.0);
+            glVertex3f(0.1, 1.1, 0.0);
+            glVertex3f(0.2, 1.15, 0.0);
+            glVertex3f(0.3, 1.1, 0.0);
         glEnd();
         
         glColor3f(1, 0, 0); // red
         
         glBegin(GL_LINE_LOOP); // mouth
-        glVertex3f(-0.1, 0.9, 0.0);
-        glVertex3f(0.1, 0.9, 0.0);
-        glVertex3f(0, 0.8, 0.0);
+            glVertex3f(-0.1, 0.9, 0.0);
+            glVertex3f(0.1, 0.9, 0.0);
+            glVertex3f(0, 0.8, 0.0);
         glEnd();
     }
     else if (gFace == 'u' ) { // usual
@@ -186,12 +252,12 @@ void YourEyeMouth() {
         glColor3f(0, 0, 0); // black
         
         glBegin(GL_LINES);
-        glVertex3f(-0.3, 1.1, 0.0); // eye
-        glVertex3f(-0.1, 1.1, 0.0);
-        glVertex3f(0.1, 1.1, 0.0); // eye
-        glVertex3f(0.3, 1.1, 0.0);
-        glVertex3f(-0.1, 0.9, 0.0); // mouth
-        glVertex3f(0.1, 0.9, 0.0);
+            glVertex3f(-0.3, 1.1, 0.0); // eye
+            glVertex3f(-0.1, 1.1, 0.0);
+            glVertex3f(0.1, 1.1, 0.0); // eye
+            glVertex3f(0.3, 1.1, 0.0);
+            glVertex3f(-0.1, 0.9, 0.0); // mouth
+            glVertex3f(0.1, 0.9, 0.0);
         glEnd();
     }
     
@@ -205,8 +271,8 @@ void YourBody(){
     glColor3f(0, 0, 0); // black neck
     
     glBegin(GL_LINES);
-    glVertex3f(0, 0.5, 0.0);
-    glVertex3f(0, 0.3, 0.0);
+        glVertex3f(0, 0.5, 0.0);
+        glVertex3f(0, 0.3, 0.0);
     glEnd();
     
     
@@ -214,10 +280,10 @@ void YourBody(){
     glColor3f(0.5, 0.5, 0.5); // gray spine
     
     glBegin(GL_POLYGON);
-    glVertex3f(-0.05, -0.3, 0.0);
-    glVertex3f(0.05, -0.3, 0.0);
-    glVertex3f(0.05, 0.3, 0.0);
-    glVertex3f(-0.05, 0.3, 0.0);
+        glVertex3f(-0.05, -0.3, 0.0);
+        glVertex3f(0.05, -0.3, 0.0);
+        glVertex3f(0.05, 0.3, 0.0);
+        glVertex3f(-0.05, 0.3, 0.0);
     glEnd();
     
     
@@ -233,8 +299,8 @@ void YourBody(){
     glTranslatef(-0.05, -0.3, 0.0);
     
         glBegin(GL_LINES); // red upperarm 시작
-        glVertex3f(0.05, 0.3, 0.0);
-        glVertex3f(0.25, 0.1, 0.0);
+            glVertex3f(0.05, 0.3, 0.0);
+            glVertex3f(0.25, 0.1, 0.0);
         glEnd();    // red upperarm 끝
     
         glPushMatrix(); // red forearm 시작
@@ -242,8 +308,8 @@ void YourBody(){
         glRotatef(gRedforearm, 0.0, 0.0, 1.0);
         glTranslatef(-0.25, -0.1, 0.0);
         glBegin(GL_LINES); // lower
-        glVertex3f(0.25, 0.1, 0.0);
-        glVertex3f(0.5, -0.2, 0.0);
+            glVertex3f(0.25, 0.1, 0.0);
+            glVertex3f(0.5, -0.2, 0.0);
         glEnd();
         glPopMatrix();  // red forearm 끝
     
@@ -258,23 +324,23 @@ void YourBody(){
     glTranslatef(0.05, -0.3, 0.0);
     
         glBegin(GL_LINES); //upper
-        glVertex3f(-0.05, 0.3, 0.0);
-        glVertex3f(-0.25, 0.1, 0.0);
+            glVertex3f(-0.05, 0.3, 0.0);
+            glVertex3f(-0.25, 0.1, 0.0);
         glEnd();
         glPushMatrix();
         glTranslatef(-0.25, 0.1, 0.0);
         glRotatef(gBlackforearm, 0.0, 0.0, 1.0);
         glTranslatef(0.25, -0.1, 0.0);
         glBegin(GL_LINES); //lower
-        glVertex3f(-0.25, 0.1, 0.0);
-        glVertex3f(-0.5, -0.2, 0.0);
+            glVertex3f(-0.25, 0.1, 0.0);
+            glVertex3f(-0.5, -0.2, 0.0);
         glEnd();
         glPopMatrix();
     
     glPopMatrix();  // black arm 전체 끝
     
     
-    glPushMatrix(); // 다리 두개 묶음
+    glPushMatrix(); // 다리 두 개 묶음
     GLfloat Shear_arr[4][4] = {
         {1, 0, 0, 0},
         {gShearLeg, 1, 0, 0},
@@ -293,8 +359,8 @@ void YourBody(){
         glRotatef(gBlueleg, 0.0, 0.0, 1.0); // (2) 회전
         glTranslatef(-0.05, 0.3 , 0.0);  // (1) 다리가 원점에서 시작하도록 이동(원점에서 시작하면 원점과 다리 사이에 공간이 없게 회전한다)
         glBegin(GL_LINES);
-        glVertex3f(0.05, -0.3, 0.0);
-        glVertex3f(0.3, -1.0, 0.0);
+            glVertex3f(0.05, -0.3, 0.0);
+            glVertex3f(0.3, -1.0, 0.0);
         glEnd();
         glPopMatrix();
         
@@ -306,8 +372,8 @@ void YourBody(){
         glRotatef(gBlackleg, 0.0, 0.0, 1.0);
         glTranslatef(0.05, 0.3, 0.0);
         glBegin(GL_LINES);
-        glVertex3f(-0.05, -0.3, 0.0);
-        glVertex3f(-0.3, -1.0, 0.0);
+            glVertex3f(-0.05, -0.3, 0.0);
+            glVertex3f(-0.3, -1.0, 0.0);
         glEnd();
         glPopMatrix();
     
