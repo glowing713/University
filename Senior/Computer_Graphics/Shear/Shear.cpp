@@ -15,6 +15,10 @@
      gShear이 0이므로 배열이 단위행렬로 초기화가 된다.
  
  
+ (3) 다리에만 전단
+ 
+ 
+ 
  Keyboard
  u a s : face
  l k f d : leg 회전
@@ -25,6 +29,8 @@
  Special
  UP and DOWN : jump
  LEFT and RIGHT : moving X
+ F1 F2 F3 : body dance
+ F4 F5 F6 : leg dance
  
  -------------------------------------------------------------*/
 
@@ -42,7 +48,7 @@ GLfloat gBlackleg = 0.0; // 왼쪽다리 회전각도
 GLfloat gRedforearm = 0.0, gBlackforearm = 0.0; // 팔꿈치 아래 회전각도
 GLfloat gRedupperarm = 0.0, gBlackupperarm = 0.0;   // 팔 전체 회전각도
 GLfloat gRedarmlength = 1.0; // 팔 길이 (0으로 초기화하면 시작할 때 팔 길이가 0으로 시작함)
-GLfloat gShear = 0.0;
+GLfloat gShear = 0.0, gShearLeg = 0.0;
 
 
 void YourBackground();
@@ -268,32 +274,44 @@ void YourBody(){
     glPopMatrix();  // black arm 전체 끝
     
     
+    glPushMatrix(); // 다리 두개 묶음
+    GLfloat Shear_arr[4][4] = {
+        {1, 0, 0, 0},
+        {gShearLeg, 1, 0, 0},
+        {0, 0, 1, 0},
+        {0, 0, 0, 1}
+    };
+    glTranslatef(0.0, -0.3, 0.0);
+    glMultMatrixf((float*)Shear_arr);
+    glTranslatef(0.0, 0.3, 0.0);
     
-    glColor3f(0, 0, 1); // blue leg
+        glColor3f(0, 0, 1); // blue leg
+        
+        glPushMatrix();
+        // 그냥 회전만 시키면 다리가 원점을 중심으로 회전하므로 몸에서 분리됨.
+        glTranslatef(0.05, -0.3, 0.0);  // (3) 다리를 원상복귀 ==> 복합변환
+        glRotatef(gBlueleg, 0.0, 0.0, 1.0); // (2) 회전
+        glTranslatef(-0.05, 0.3 , 0.0);  // (1) 다리가 원점에서 시작하도록 이동(원점에서 시작하면 원점과 다리 사이에 공간이 없게 회전한다)
+        glBegin(GL_LINES);
+        glVertex3f(0.05, -0.3, 0.0);
+        glVertex3f(0.3, -1.0, 0.0);
+        glEnd();
+        glPopMatrix();
+        
+        
+        glColor3f(0, 0, 0); // black leg
+        
+        glPushMatrix();
+        glTranslatef(-0.05, -0.3, 0.0);
+        glRotatef(gBlackleg, 0.0, 0.0, 1.0);
+        glTranslatef(0.05, 0.3, 0.0);
+        glBegin(GL_LINES);
+        glVertex3f(-0.05, -0.3, 0.0);
+        glVertex3f(-0.3, -1.0, 0.0);
+        glEnd();
+        glPopMatrix();
     
-    glPushMatrix();
-    // 그냥 회전만 시키면 다리가 원점을 중심으로 회전하므로 몸에서 분리됨.
-    glTranslatef(0.05, -0.3, 0.0);  // (3) 다리를 원상복귀 ==> 복합변환
-    glRotatef(gBlueleg, 0.0, 0.0, 1.0); // (2) 회전
-    glTranslatef(-0.05, 0.3 , 0.0);  // (1) 다리가 원점에서 시작하도록 이동(원점에서 시작하면 원점과 다리 사이에 공간이 없게 회전한다)
-    glBegin(GL_LINES);
-    glVertex3f(0.05, -0.3, 0.0);
-    glVertex3f(0.3, -1.0, 0.0);
-    glEnd();
-    glPopMatrix();
-    
-    
-    glColor3f(0, 0, 0); // black leg
-    
-    glPushMatrix();
-    glTranslatef(-0.05, -0.3, 0.0);
-    glRotatef(gBlackleg, 0.0, 0.0, 1.0);
-    glTranslatef(0.05, 0.3, 0.0);
-    glBegin(GL_LINES);
-    glVertex3f(-0.05, -0.3, 0.0);
-    glVertex3f(-0.3, -1.0, 0.0);
-    glEnd();
-    glPopMatrix();
+    glPopMatrix();  // 두 다리 끝
     
     glLineWidth(1);  // line
     
@@ -368,6 +386,10 @@ void MySpecial(int key, int x, int y) {
         case GLUT_KEY_F1:   gShear = -0.5;  gFace = 's'; gRedupperarm = 48; gBlackupperarm = -48;    break;
         case GLUT_KEY_F2:   gShear = 0.0;  gFace = 'u'; gRedupperarm = 0; gBlackupperarm = 0;    break;
         case GLUT_KEY_F3:   gShear = 0.5;  gFace = 's'; gRedupperarm = 48; gBlackupperarm = -48;    break;
+            
+        case GLUT_KEY_F4:   gShearLeg = 0.5;  gFace = 's'; gRedupperarm = 48; gBlackupperarm = -48;    break;
+        case GLUT_KEY_F5:   gShearLeg = 0.0;  gFace = 'u'; gRedupperarm = 0; gBlackupperarm = 0;    break;
+        case GLUT_KEY_F6:   gShearLeg = -0.5;  gFace = 's'; gRedupperarm = 48; gBlackupperarm = -48;    break;
     }
     
     glutPostRedisplay();
