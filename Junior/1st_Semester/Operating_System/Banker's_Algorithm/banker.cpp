@@ -8,9 +8,9 @@ class banker{
 private:
     int pn = 0, rn = 0, que_count = 0;
     string sen;
-    int max[MAX][MAX] = {0}, alloc[MAX][MAX] = {0}, need[MAX][MAX] = {0}, avail[MAX] = {0}, total[MAX] = {0},
-    temp[MAX] = {0}, work_alloc[MAX][MAX] = {0}, work_need[MAX][MAX] = {0}, work_avail[MAX] = {0};
-    vector< int > sun, wait_q;
+    int max[MAX][MAX] = {{0}}, alloc[MAX][MAX] = {{0}}, need[MAX][MAX] = {{0}}, avail[MAX] = {{0}}, total[MAX] = {{0}},
+    temp[MAX] = {{0}}, work_alloc[MAX][MAX] = {{0}}, work_need[MAX][MAX] = {{0}}, work_avail[MAX] = {{0}};
+    vector<int> sun, wait_q;
     
 public:
     void execute();
