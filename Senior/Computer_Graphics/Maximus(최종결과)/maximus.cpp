@@ -1,12 +1,7 @@
 /*-----------------------------------------------------------
- 9th week
+ 10th week
  
- Q. 모션을 추가하기 위해 소스 어디어디를 추가해야 할까?
-    - 전역변수 6개,
-    - MyiPhone 함수에 glTranslatef(gPhoneX, gPhoneY, 0)
-    - MyMotion 함수 구현
-    - MyReshape 함수에서 지역변수 4개 전역변수에
-    - main에서 glutMotionFunc 호출
+ (1) menu 추가 - day, night (바탕색, 하늘, 초원, 매트, 얼굴 톤 다운)
  
  Keyboard
  u a s : face
@@ -38,6 +33,7 @@ GLfloat gRedforearm = 0.0, gBlackforearm = 0.0; // 팔꿈치 아래 회전각도
 GLfloat gRedupperarm = 0.0, gBlackupperarm = 0.0;   // 팔 전체 회전각도
 GLfloat gRedarmlength = 1.0; // 팔 길이 (0으로 초기화하면 시작할 때 팔 길이가 0으로 시작함)
 GLfloat gShear = 0.0, gShearLeg = 0.0;
+unsigned char gBackground = 'D';
 
 
 GLfloat gPhoneX = -3.0;
@@ -46,7 +42,7 @@ GLint gNewWidth, gNewHeight;
 GLfloat gWidthFactor, gHeightFactor;
 GLint i = 0;
 
-
+void MyInit();
 void YourBackground();
 void YourMat();
 void YourFace();
@@ -56,6 +52,7 @@ void MyiPhone();
 void MyKeyboard(unsigned char key, int x, int y);
 void MySpecial(int key, int x, int y);
 void MyMotion(GLint X, GLint Y);
+void MyMainMenu(int entryID);
 
 
 
@@ -160,7 +157,10 @@ void MyiPhone() {
 
 void YourBackground(){
     
-    glColor3f(0, 1, 1); // sky
+    if (gBackground == 'D')
+        glColor3f(0, 1, 1); // sky
+    else
+        glColor3f(0.2, 0.2, 0.2);   // blackgrey
     
     glBegin(GL_POLYGON);
         glVertex3f(-4, 0, -4);
@@ -169,7 +169,10 @@ void YourBackground(){
         glVertex3f(-4, 3, -4);
     glEnd();
     
-    glColor3f(0, 1, 0); // green
+    if (gBackground == 'D')
+        glColor3f(0, 1, 0); // green
+    else
+        glColor3f(0, 0.3, 0);   // blackgreen
     
     glBegin(GL_POLYGON);
         glVertex3f(-4, -3, -4);
@@ -182,7 +185,10 @@ void YourBackground(){
 
 void YourMat() {
     
-    glColor3f(0xE4/255.0, 0xBE/255.0, 0xFE/255.0); // 연보라색
+    if (gBackground == 'D')
+        glColor3f(0xE4/255.0, 0xBE/255.0, 0xFE/255.0); // 연보라색
+    else
+        glColor3f(0.3, 0, 0.3);    // blackpurple
     glBegin(GL_POLYGON);
         glVertex3f(-1.5, -1.3, 0);
         glVertex3f(1.2, -1.3, 0);
@@ -195,7 +201,10 @@ void YourMat() {
 
 void YourFace(){
     
-    glColor3f(251/255.0, 206/255.0, 177/255.0); // 살구색
+    if (gBackground == 'D')
+        glColor3f(251/255.0, 206/255.0, 177/255.0); // 살구색
+    else
+        glColor3f(0.6, 0.4, 0.4);
     
     glPushMatrix(); // Push 와 Pop 사이의 기하변환은 이 안에서만 유효하다.
     glTranslatef(0.0, 1.0, 0.0);    // 얼굴 y좌표로 1.0 이동
@@ -495,6 +504,24 @@ void MyReshape(int NewWidth, int NewHeight) {
     glOrtho(-4 * WidthFactor, 4 * WidthFactor, -3 * HeightFactor, 3 * HeightFactor, -4, 4);
 } // MyReshape
 
+void MyInit() {
+    glClearColor(1.0, 1.0, 1.0, 1.0);
+    
+    GLint MyMainMenuID = glutCreateMenu(MyMainMenu);
+    glutAddMenuEntry("Day", 1);
+    glutAddMenuEntry("Night", 2);
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void MyMainMenu(int entryID) {
+    if (entryID == 1) {
+        glClearColor(1, 1, 1, 1);   gBackground = 'D';
+    }else if (entryID == 2){
+        glClearColor(0, 0, 0, 0);   gBackground = 'N';
+    }
+    glutPostRedisplay();
+}
+
 
 
 int main(int argc, char** argv) {
@@ -504,7 +531,7 @@ int main(int argc, char** argv) {
     glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
     glutInitWindowPosition(200, 150);
     glutCreateWindow("Maximus");
-    glClearColor(1.0, 1.0, 1.0, 1.0);
+    MyInit();
     glutDisplayFunc(MyDisplay);
     glutReshapeFunc(MyReshape);
     glutMotionFunc(MyMotion);
