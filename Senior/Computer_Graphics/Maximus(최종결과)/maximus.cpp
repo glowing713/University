@@ -28,6 +28,7 @@
 unsigned char gFace = 'u';   // u:usual  a:angry   s:smiling
 GLfloat gY = 0.0;  // jump
 GLfloat gX = 0.0;  // moving-X
+GLfloat gZ = 0.0;   // 앞뒤이동
 GLfloat gBlueleg = 0.0; // 오른쪽다리 회전각도
 GLfloat gBlackleg = 0.0; // 왼쪽다리 회전각도
 GLfloat gRedforearm = 0.0, gBlackforearm = 0.0; // 팔꿈치 아래 회전각도
@@ -51,7 +52,7 @@ void YourFace();
 void YourEyeMouth();
 void YourBody();
 void MyiPhone();
-//void YourUmbrella();
+void YourUmbrella();
 void MyKeyboard(unsigned char key, int x, int y);
 void MySpecial(int key, int x, int y);
 void MyMotion(GLint X, GLint Y);
@@ -75,7 +76,7 @@ void MyDisplay() {
     
     // 여기서부터 막시무스
     glPushMatrix();
-    glTranslatef(gX, gY, 0.0);
+    glTranslatef(gX, gY, gZ);   // left, right, jump, 앞뒤 이동
     GLfloat Shear_arr[4][4] = {
         {1, 0, 0, 0},
         {gShear, 1, 0, 0},
@@ -89,7 +90,7 @@ void MyDisplay() {
     YourFace();
     YourEyeMouth();
     YourBody();
-//    YourUmbrella();
+    YourUmbrella();
     glPopMatrix();
     // 여기까지 막시무스
     
@@ -108,11 +109,26 @@ void MyDisplay() {
 } // MyDisplay
 
 
-//void YourUmbrella() {
-//    if (gBackground == 'R') {
-//        gBlackforearm = -80.0;
-//    }
-//}
+void YourUmbrella() {
+    if (gBackground == 'R') {
+        gBlackforearm = -50.0;
+        gBlackupperarm = -20.0;
+        
+        glPushMatrix();
+            glColor3f(1.0, 1.0, 1.0);
+        
+            glTranslatef(-0.7, 1.5, 0);
+            glRotatef(-90, 1, 0, 0);
+            glScalef(1.3, 0.5, 1);
+            glutSolidCone(1.0, 1.0, 12, 12);
+        glPopMatrix();
+        
+        glBegin(GL_LINES);
+        glVertex3f(-0.7, 0.3, 0);
+        glVertex3f(-0.7, 1.7, 0);
+        glEnd();
+    }
+}
 
 
 
@@ -177,10 +193,10 @@ void YourBackground(){
         glColor3f(0.2, 0.2, 0.2);   // blackgrey
     
     glBegin(GL_POLYGON);
-        glVertex3f(-4, 0, 0);
-        glVertex3f(4, 0, 0);
-        glVertex3f(4, 3, 0);
-        glVertex3f(-4, 3, 0);
+        glVertex3f(-10, 0, -4);
+        glVertex3f(10, 0, -4);
+        glVertex3f(10, 8, -4);
+        glVertex3f(-10, 8, -4);
     glEnd();
     
     if (gBackground == 'D')
@@ -189,10 +205,10 @@ void YourBackground(){
         glColor3f(0, 0.3, 0);   // blackgreen
     
     glBegin(GL_POLYGON);
-        glVertex3f(-4, -3, 0);
-        glVertex3f(4, -3, 0);
-        glVertex3f(4, 0, 0);
-        glVertex3f(-4, 0, 0);
+        glVertex3f(-10, -8, -4);
+        glVertex3f(10, -8, -4);
+        glVertex3f(10, 0, -4);
+        glVertex3f(-10, 0, -4);
     glEnd();
     
     if (gBackground == 'R') {
@@ -500,6 +516,9 @@ void MySpecial(int key, int x, int y) {
         case GLUT_KEY_F4:   gShearLeg = 0.5;  gFace = 's'; gRedupperarm = 48; gBlackupperarm = -48;    break;
         case GLUT_KEY_F5:   gShearLeg = 0.0;  gFace = 'u'; gRedupperarm = 0; gBlackupperarm = 0;    break;
         case GLUT_KEY_F6:   gShearLeg = -0.5;  gFace = 's'; gRedupperarm = 48; gBlackupperarm = -48;    break;
+            
+        case GLUT_KEY_F9:  if (gZ <= 3) gZ += 0.1;  break;
+        case GLUT_KEY_F10:  if (gZ >= -3) gZ -= 0.1;  break;
     }
     
     glutPostRedisplay();
