@@ -2,6 +2,7 @@
  10th week
  
  (1) menu 추가 - day, night (바탕색, 하늘, 초원, 매트, 얼굴 톤 다운)
+ (2) timer 추가 - rain 표현 (재귀함수의 특성을 이용해서 비 내리는 밤 표현)
  
  Keyboard
  u a s : face
@@ -34,6 +35,7 @@ GLfloat gRedupperarm = 0.0, gBlackupperarm = 0.0;   // 팔 전체 회전각도
 GLfloat gRedarmlength = 1.0; // 팔 길이 (0으로 초기화하면 시작할 때 팔 길이가 0으로 시작함)
 GLfloat gShear = 0.0, gShearLeg = 0.0;
 unsigned char gBackground = 'D';
+GLint gTimeslot = 0;
 
 
 GLfloat gPhoneX = -3.0;
@@ -49,10 +51,12 @@ void YourFace();
 void YourEyeMouth();
 void YourBody();
 void MyiPhone();
+//void YourUmbrella();
 void MyKeyboard(unsigned char key, int x, int y);
 void MySpecial(int key, int x, int y);
 void MyMotion(GLint X, GLint Y);
 void MyMainMenu(int entryID);
+void MyTimer(int value);
 
 
 
@@ -62,6 +66,8 @@ void MyDisplay() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 //    gluLookAt(0, 0, 4.3, 0, 0, 0, 0, 1, 0);   // 무대 z값이 -4 ~ 4에서 0.3 ~ 8.3 범위로 변경 => 다른 건 다 원점에 있으므로 안보이고, sphere인 머리만 조금 보임
+    
+    glTranslatef(0, 0, -5);
     
     YourBackground();
     YourMat();
@@ -83,6 +89,7 @@ void MyDisplay() {
     YourFace();
     YourEyeMouth();
     YourBody();
+//    YourUmbrella();
     glPopMatrix();
     // 여기까지 막시무스
     
@@ -99,6 +106,13 @@ void MyDisplay() {
     glutSwapBuffers();
     
 } // MyDisplay
+
+
+//void YourUmbrella() {
+//    if (gBackground == 'R') {
+//        gBlackforearm = -80.0;
+//    }
+//}
 
 
 
@@ -163,10 +177,10 @@ void YourBackground(){
         glColor3f(0.2, 0.2, 0.2);   // blackgrey
     
     glBegin(GL_POLYGON);
-        glVertex3f(-4, 0, -4);
-        glVertex3f(4, 0, -4);
-        glVertex3f(4, 3, -4);
-        glVertex3f(-4, 3, -4);
+        glVertex3f(-4, 0, 0);
+        glVertex3f(4, 0, 0);
+        glVertex3f(4, 3, 0);
+        glVertex3f(-4, 3, 0);
     glEnd();
     
     if (gBackground == 'D')
@@ -175,11 +189,31 @@ void YourBackground(){
         glColor3f(0, 0.3, 0);   // blackgreen
     
     glBegin(GL_POLYGON);
-        glVertex3f(-4, -3, -4);
-        glVertex3f(4, -3, -4);
-        glVertex3f(4, 0, -4);
-        glVertex3f(-4, 0, -4);
+        glVertex3f(-4, -3, 0);
+        glVertex3f(4, -3, 0);
+        glVertex3f(4, 0, 0);
+        glVertex3f(-4, 0, 0);
     glEnd();
+    
+    if (gBackground == 'R') {
+        glColor3f(0.9, 0.9, 0.9);   // 비 색
+        
+        if (gTimeslot % 3 == 0) {
+            glBegin(GL_LINES);
+                glVertex3f(-3, 2, 0);   glVertex3f(-3, 1.8, 0);
+                glVertex3f(3.3, 2.8, 0);    glVertex3f(3.3, 2.6, 0);
+            glEnd();
+        }else if (gTimeslot % 3 == 1) {
+            glBegin(GL_LINES);
+                glVertex3f(0, 2.7, 0);  glVertex3f(0, 2.5, 0);
+            glEnd();
+        }else {
+            glBegin(GL_LINES);
+                glVertex3f(-1, 1.7, 0); glVertex3f(-1, 1.5, 0);
+                glVertex3f(2.9, 1.8, 0);    glVertex3f(2.9, 1.6, 0);
+            glEnd();
+        }
+    }
 
 }
 
@@ -501,7 +535,8 @@ void MyReshape(int NewWidth, int NewHeight) {
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-4 * WidthFactor, 4 * WidthFactor, -3 * HeightFactor, 3 * HeightFactor, -4, 4);
+//    glOrtho(-4 * WidthFactor, 4 * WidthFactor, -3 * HeightFactor, 3 * HeightFactor, -4, 4);
+    gluPerspective(65, (GLfloat)NewWidth/(GLfloat)NewHeight, 1, 9); // 원근 투영 z: -1 ~ -9
 } // MyReshape
 
 void MyInit() {
@@ -510,16 +545,28 @@ void MyInit() {
     GLint MyMainMenuID = glutCreateMenu(MyMainMenu);
     glutAddMenuEntry("Day", 1);
     glutAddMenuEntry("Night", 2);
+    glutAddMenuEntry("Rain", 3);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 void MyMainMenu(int entryID) {
     if (entryID == 1) {
         glClearColor(1, 1, 1, 1);   gBackground = 'D';
-    }else if (entryID == 2){
+    }else if (entryID == 2) {
         glClearColor(0, 0, 0, 0);   gBackground = 'N';
+    }else if (entryID == 3) {
+        glClearColor(0, 0, 0, 0);   gBackground = 'R';  glutTimerFunc(400, MyTimer, 1);
     }
     glutPostRedisplay();
+}
+
+void MyTimer(int value) {
+    if (gBackground == 'R') {
+        gTimeslot = (gTimeslot + 1) % 100;  // 0~99 반복
+        printf("gTimeslot: %d\n", gTimeslot);
+        glutPostRedisplay();
+        glutTimerFunc(400, MyTimer, 1); // 중간에 메뉴가 day나 night로 바뀌면 타이머 종료
+    }
 }
 
 
