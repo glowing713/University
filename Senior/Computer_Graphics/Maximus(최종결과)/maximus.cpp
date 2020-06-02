@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------
- 10th week
+ 11th week
  
  (1) menu 추가 - day, night (바탕색, 하늘, 초원, 매트, 얼굴 톤 다운)
  (2) timer 추가 - rain 표현 (재귀함수의 특성을 이용해서 비 내리는 밤 표현)
@@ -14,8 +14,12 @@
  Special
  UP and DOWN : jump
  LEFT and RIGHT : moving X
- F1 F2 F3 : body dance
- F4 F5 F6 : leg dance
+ F1 - F3, F4 - F6 : body/leg shear
+ F9, F10 : moving-Z
+ 
+ Motion
+ Menu
+ Timer(rain)
  
  -----------------------------------------------------------*/
 
@@ -63,7 +67,7 @@ void MyTimer(int value);
 
 void MyDisplay() {
     
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 //    gluLookAt(0, 0, 4.3, 0, 0, 0, 0, 1, 0);   // 무대 z값이 -4 ~ 4에서 0.3 ~ 8.3 범위로 변경 => 다른 건 다 원점에 있으므로 안보이고, sphere인 머리만 조금 보임
@@ -186,6 +190,17 @@ void MyiPhone() {
 
 
 void YourBackground(){
+    /*
+     파란하늘/푸른초원 z값은 원래 -4.
+
+     무대(gluPerspective)의 z범위는 -1~-9
+
+     그런데 MyDisplay함수에서 모든 등장하는객체들을 전체적으로 z축으로 -5만큼 Ttranslate.
+
+     따라서 파란하늘/푸른초원 z값은 최종 -9 (무대 뒤쪽 경계선에 위치)
+
+     Z버퍼 켠 후 -4대신 -3.9를 넣음으로써 -8.9가 되었고 따라서 경계선에 있다가 무대 안으로 살짝 이동하였습니다.
+     */
     
     if (gBackground == 'D')
         glColor3f(0, 1, 1); // sky
@@ -193,10 +208,10 @@ void YourBackground(){
         glColor3f(0.2, 0.2, 0.2);   // blackgrey
     
     glBegin(GL_POLYGON);
-        glVertex3f(-10, 0, -4);
-        glVertex3f(10, 0, -4);
-        glVertex3f(10, 8, -4);
-        glVertex3f(-10, 8, -4);
+        glVertex3f(-10, 0, -3.9);
+        glVertex3f(10, 0, -3.9);
+        glVertex3f(10, 8, -3.9);
+        glVertex3f(-10, 8, -3.9);
     glEnd();
     
     if (gBackground == 'D')
@@ -205,10 +220,10 @@ void YourBackground(){
         glColor3f(0, 0.3, 0);   // blackgreen
     
     glBegin(GL_POLYGON);
-        glVertex3f(-10, -8, -4);
-        glVertex3f(10, -8, -4);
-        glVertex3f(10, 0, -4);
-        glVertex3f(-10, 0, -4);
+        glVertex3f(-10, -8, -3.9);
+        glVertex3f(10, -8, -3.9);
+        glVertex3f(10, 0, -3.9);
+        glVertex3f(-10, 0, -3.9);
     glEnd();
     
     if (gBackground == 'R') {
@@ -266,6 +281,9 @@ void YourFace(){
 
 void YourEyeMouth() {
     
+    glPushMatrix();
+//    glTranslatef(0, 0, 0.5);    // 눈코입을 앞으로 당길수록(Z축) "원근이 적용되었기 때문에", 눈코입이 위로 올라가는 듯한 효과가 나타난다.
+    
     if (gFace=='a') {  // angry
         
         glColor3f(0, 0, 0); // black
@@ -320,6 +338,8 @@ void YourEyeMouth() {
             glVertex3f(0.1, 0.9, 0.0);
         glEnd();
     }
+    
+    glPopMatrix();
     
 } // YourEyeMouth
 
@@ -560,6 +580,7 @@ void MyReshape(int NewWidth, int NewHeight) {
 
 void MyInit() {
     glClearColor(1.0, 1.0, 1.0, 1.0);
+//    glEnable(GL_DEPTH_TEST);    // 깊이 추가(Z), 이걸 추가해야 z-buffer가 적용된다.
     
     GLint MyMainMenuID = glutCreateMenu(MyMainMenu);
     glutAddMenuEntry("Day", 1);
@@ -593,7 +614,7 @@ void MyTimer(int value) {
 int main(int argc, char** argv) {
     
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
     glutInitWindowPosition(200, 150);
     glutCreateWindow("Maximus");
