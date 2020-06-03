@@ -254,11 +254,17 @@ void YourMat() {
         glColor3f(0xE4/255.0, 0xBE/255.0, 0xFE/255.0); // 연보라색
     else
         glColor3f(0.3, 0, 0.3);    // blackpurple
+//    glBegin(GL_POLYGON);
+//        glVertex3f(-1.5, -1.3, 0);
+//        glVertex3f(1.2, -1.3, 0);
+//        glVertex3f(1.5, -0.8, 0);
+//        glVertex3f(-1.2, -0.8, 0);
+//    glEnd();
     glBegin(GL_POLYGON);
-        glVertex3f(-1.5, -1.3, 0);
-        glVertex3f(1.2, -1.3, 0);
-        glVertex3f(1.5, -0.8, 0);
-        glVertex3f(-1.2, -0.8, 0);
+        glVertex3f(-1.5, -1, 1.5);  // 바닥에 펼쳐진 정사각형
+        glVertex3f(1.5, -1, 1.5);
+        glVertex3f(1.5, -1, -1.5);
+        glVertex3f(-1.5, -1, -1.5);
     glEnd();
     
 } // YourMat
