@@ -1,8 +1,15 @@
 /*-----------------------------------------------------------
  11th week
  
- (1) menu 추가 - day, night (바탕색, 하늘, 초원, 매트, 얼굴 톤 다운)
- (2) timer 추가 - rain 표현 (재귀함수의 특성을 이용해서 비 내리는 밤 표현)
+ (1) 매트를 바닥에 polygon으로 펼쳤는데, glOrtho로 하면 안보이는 이유?
+     GL_POLYGON은 두께가 없으므로, 정사투영에서 정면에서 바라보면 아예 안보임. 원근으로 하면 보인다.
+ (2) 꽃의 위치를 움직이면 전단할 때, 발끝 고정이 안되는 이유?
+     전단 중심 Y값을 절대적인 위치로 두었기 때문에, 움직인 후에는 발끝 고정이 안됨.
+     --> 꽃의 상대적인 위치로 전단 위아래 이동함수를 바꿔주면 된다.
+ (3) glOrtho일 때, 잘 되던 motion이, 원근 넣으니까 마우스 위치랑 다르게 보이는 이유?
+     원근을 넣었으므로 마우스 커서 위치와 z값이 다르기 때문에 미세하게 차이가 발생.
+     maximus가 앞으로 올 때, 눈입이 위로 올라가는 것과 같은 이치.
+     
  
  Keyboard
  u a s : face
@@ -101,9 +108,9 @@ void MyDisplay() {
     
     // 여기서부터 아이폰
     glPushMatrix();
-    glTranslatef(-2.6, -2.8, 0.0);
+    glTranslatef(0, gPhoneY-1.5, 0.0);
     glMultMatrixf((float*)Shear_arr);
-    glTranslatef(2.6, 2.8, 0.0);
+    glTranslatef(0, -gPhoneY+1.5, 0.0);
     MyiPhone();
     glPopMatrix();
     // 여기까지 아이폰
@@ -137,7 +144,7 @@ void YourUmbrella() {
 
 
 void MyiPhone() {
-    glTranslatef(gPhoneX + 2.75, gPhoneY + 1.8, 0);
+    glTranslatef(gPhoneX + 2.75, gPhoneY + 1.8, 0); // 커서를 phone의 중심으로
     
     glColor3f(1.0, 1.0, 1.0);
                  
@@ -260,7 +267,7 @@ void YourMat() {
 //        glVertex3f(1.5, -0.8, 0);
 //        glVertex3f(-1.2, -0.8, 0);
 //    glEnd();
-    glBegin(GL_POLYGON);
+    glBegin(GL_POLYGON);    // 두께가 없고 면만 있어서 정면에서 보면 안보인다.
         glVertex3f(-1.5, -1, 1.5);  // 바닥에 펼쳐진 정사각형
         glVertex3f(1.5, -1, 1.5);
         glVertex3f(1.5, -1, -1.5);
@@ -553,12 +560,8 @@ void MySpecial(int key, int x, int y) {
 
 
 void MyMotion(GLint X, GLint Y) {
-    printf("X: %d Y: %d\n", X, Y);
-    printf("gwidthfactor: %lf gheightfactor: %lf\n", gWidthFactor, gHeightFactor);
-    printf("gnewwidth: %d gnewheight: %d\n", gNewWidth, gNewHeight);
     gPhoneX = (GLfloat)X / gNewWidth * 8*gWidthFactor - 4*gWidthFactor;  // (5)
     gPhoneY = (GLfloat)(gNewHeight-Y) / gNewHeight * 6*gHeightFactor - 3*gHeightFactor;  // (5)
-    printf("gphonex: %lf gphoney: %lf\n", gPhoneX, gPhoneY);
     glutPostRedisplay();
 }
 
@@ -580,7 +583,7 @@ void MyReshape(int NewWidth, int NewHeight) {
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-//    glOrtho(-4 * WidthFactor, 4 * WidthFactor, -3 * HeightFactor, 3 * HeightFactor, -4, 4);
+//    glOrtho(-4 * WidthFactor, 4 * WidthFactor, -3 * HeightFactor, 3 * HeightFactor, 1, 9);
     gluPerspective(65, (GLfloat)NewWidth/(GLfloat)NewHeight, 1, 9); // 원근 투영 z: -1 ~ -9
 } // MyReshape
 
@@ -609,7 +612,7 @@ void MyMainMenu(int entryID) {
 void MyTimer(int value) {
     if (gBackground == 'R') {
         gTimeslot = (gTimeslot + 1) % 100;  // 0~99 반복
-        printf("gTimeslot: %d\n", gTimeslot);
+        
         glutPostRedisplay();
         glutTimerFunc(400, MyTimer, 1); // 중간에 메뉴가 day나 night로 바뀌면 타이머 종료
     }
