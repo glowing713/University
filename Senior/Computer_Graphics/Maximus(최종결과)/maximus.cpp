@@ -4,6 +4,10 @@
  (1) 조명 넣으려면, 서비스 차원의 달빛 넣어주고
  (2) 얼굴 위에서 조명 on, 얼굴 아래에서 조명 off
  (3) 조명받는 하에서 얼굴색은 glMaterialfv로 설정해준다.
+ (4) 만약 조명을 안꺼주면, 한번 materialfv함수가 작동되면, 이후에 모든 오브젝트에 효과가 적용된다.
+ (5) 현재 z-buffer은 켜지지 않은 상황이다. 조명 z값(앞뒤위치)이 예상치 못한 방향으로 나옴.
+     빨간행성,파란행성은 z-buffer가 켜져있기 때문에, 광원이 앞뒤이동할 때 조명을 잘 받는다.
+     ===> 조명 on/off 할 때, z-buffer도 on/off해주면, 앞뒤이동시에도 조명이 잘 작동한다.
  
  Keyboard
  u a s : face
@@ -293,6 +297,7 @@ void YourFace(){
     
     if (gBackground == 'N') {
         glEnable(GL_LIGHTING);
+        glEnable(GL_DEPTH_TEST);
         glEnable(GL_LIGHT0);
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gFace_color);    // 조명 하의 얼굴색 넣는 함수
     }
@@ -303,7 +308,10 @@ void YourFace(){
     glutSolidSphere(0.5, 50, 50);
     glPopMatrix();
     
-    if (gBackground == 'N') glDisable(GL_LIGHTING);
+    if (gBackground == 'N') {
+        glDisable(GL_LIGHTING);
+        glDisable(GL_DEPTH_TEST);
+    }
     
 } // YourFace
 
