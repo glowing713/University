@@ -1,15 +1,9 @@
 /*-----------------------------------------------------------
- 11th week
+ 13th week
  
- (1) 매트를 바닥에 polygon으로 펼쳤는데, glOrtho로 하면 안보이는 이유?
-     GL_POLYGON은 두께가 없으므로, 정사투영에서 정면에서 바라보면 아예 안보임. 원근으로 하면 보인다.
- (2) 꽃의 위치를 움직이면 전단할 때, 발끝 고정이 안되는 이유?
-     전단 중심 Y값을 절대적인 위치로 두었기 때문에, 움직인 후에는 발끝 고정이 안됨.
-     --> 꽃의 상대적인 위치로 전단 위아래 이동함수를 바꿔주면 된다.
- (3) glOrtho일 때, 잘 되던 motion이, 원근 넣으니까 마우스 위치랑 다르게 보이는 이유?
-     원근을 넣었으므로 마우스 커서 위치와 z값이 다르기 때문에 미세하게 차이가 발생.
-     maximus가 앞으로 올 때, 눈입이 위로 올라가는 것과 같은 이치.
-     
+ (1) 조명 넣으려면, 서비스 차원의 달빛 넣어주고
+ (2) 얼굴 위에서 조명 on, 얼굴 아래에서 조명 off
+ (3) 조명받는 하에서 얼굴색은 glMaterialfv로 설정해준다.
  
  Keyboard
  u a s : face
@@ -48,6 +42,9 @@ GLfloat gRedarmlength = 1.0; // 팔 길이 (0으로 초기화하면 시작할 �
 GLfloat gShear = 0.0, gShearLeg = 0.0;
 unsigned char gBackground = 'D';
 GLint gTimeslot = 0;
+
+const GLfloat gFace_color[] = { 251/255.0, 206/255.0, 177/255.0, 1.0 }; // 조명 하의 얼굴색
+const GLfloat gLight_pos[] = { 0.0, 0.0, 0.0, 1.0 };    // 광원 위치
 
 
 GLfloat gPhoneX = -3.0;
@@ -251,7 +248,17 @@ void YourBackground(){
                 glVertex3f(2.9, 1.8, 0);    glVertex3f(2.9, 1.6, 0);
             glEnd();
         }
-    }
+    }   // Rain
+    
+    if (gBackground == 'N') {
+        glColor3f(0.9, 0.9, 0.9);   // 달의 색
+        // 달 그리기
+        glPushMatrix();
+            glTranslatef(0, 3, 0);
+            glLightfv(GL_LIGHT0, GL_POSITION, gLight_pos);
+            glutSolidSphere(0.05, 30, 30);
+        glPopMatrix();
+    }   // Night
 
 }
 
@@ -284,10 +291,19 @@ void YourFace(){
     else
         glColor3f(0.6, 0.4, 0.4);
     
+    if (gBackground == 'N') {
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, gFace_color);    // 조명 하의 얼굴색 넣는 함수
+    }
+    
+    // 실제 얼굴
     glPushMatrix(); // Push 와 Pop 사이의 기하변환은 이 안에서만 유효하다.
     glTranslatef(0.0, 1.0, 0.0);    // 얼굴 y좌표로 1.0 이동
     glutSolidSphere(0.5, 50, 50);
     glPopMatrix();
+    
+    if (gBackground == 'N') glDisable(GL_LIGHTING);
     
 } // YourFace
 
@@ -637,4 +653,3 @@ int main(int argc, char** argv) {
     glutMainLoop();
     return 0;
 }
-
