@@ -1,13 +1,7 @@
 /*-----------------------------------------------------------
  13th week
  
- (1) 조명 넣으려면, 서비스 차원의 달빛 넣어주고
- (2) 얼굴 위에서 조명 on, 얼굴 아래에서 조명 off
- (3) 조명받는 하에서 얼굴색은 glMaterialfv로 설정해준다.
- (4) 만약 조명을 안꺼주면, 한번 materialfv함수가 작동되면, 이후에 모든 오브젝트에 효과가 적용된다.
- (5) 현재 z-buffer은 켜지지 않은 상황이다. 조명 z값(앞뒤위치)이 예상치 못한 방향으로 나옴.
-     빨간행성,파란행성은 z-buffer가 켜져있기 때문에, 광원이 앞뒤이동할 때 조명을 잘 받는다.
-     ===> 조명 on/off 할 때, z-buffer도 on/off해주면, 앞뒤이동시에도 조명이 잘 작동한다.
+ 타이머를 이용한 혼자 움직이는 막시무스!
  
  Keyboard
  u a s : face
@@ -69,7 +63,8 @@ void MyKeyboard(unsigned char key, int x, int y);
 void MySpecial(int key, int x, int y);
 void MyMotion(GLint X, GLint Y);
 void MyMainMenu(int entryID);
-void MyTimer(int value);
+void MyRainTimer(int value);
+void MyNightTimer(int value);
 
 
 
@@ -119,6 +114,7 @@ void MyDisplay() {
     glutSwapBuffers();
     
 } // MyDisplay
+
 
 
 void YourUmbrella() {
@@ -197,6 +193,7 @@ void MyiPhone() {
 }
 
 
+
 void YourBackground(){
     /*
      파란하늘/푸른초원 z값은 원래 -4.
@@ -266,6 +263,8 @@ void YourBackground(){
 
 }
 
+
+
 void YourMat() {
     
     if (gBackground == 'D')
@@ -286,6 +285,7 @@ void YourMat() {
     glEnd();
     
 } // YourMat
+
 
 
 void YourFace(){
@@ -314,6 +314,7 @@ void YourFace(){
     }
     
 } // YourFace
+
 
 
 void YourEyeMouth() {
@@ -539,6 +540,8 @@ void MyKeyboard(unsigned char key, int x, int y) {
     
 } // MyKeyboard
 
+
+
 void MySpecial(int key, int x, int y) {
     
     switch (key) {
@@ -583,6 +586,7 @@ void MySpecial(int key, int x, int y) {
 } // MySpecial
 
 
+
 void MyMotion(GLint X, GLint Y) {
     gPhoneX = (GLfloat)X / gNewWidth * 8*gWidthFactor - 4*gWidthFactor;  // (5)
     gPhoneY = (GLfloat)(gNewHeight-Y) / gNewHeight * 6*gHeightFactor - 3*gHeightFactor;  // (5)
@@ -611,6 +615,7 @@ void MyReshape(int NewWidth, int NewHeight) {
     gluPerspective(65, (GLfloat)NewWidth/(GLfloat)NewHeight, 1, 9); // 원근 투영 z: -1 ~ -9
 } // MyReshape
 
+
 void MyInit() {
     glClearColor(1.0, 1.0, 1.0, 1.0);
 //    glEnable(GL_DEPTH_TEST);    // 깊이 추가(Z), 이걸 추가해야 z-buffer가 적용된다.
@@ -622,24 +627,84 @@ void MyInit() {
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
+
 void MyMainMenu(int entryID) {
     if (entryID == 1) {
         glClearColor(1, 1, 1, 1);   gBackground = 'D';
     }else if (entryID == 2) {
-        glClearColor(0, 0, 0, 0);   gBackground = 'N';
+        glClearColor(0, 0, 0, 0);   gBackground = 'N';  gTimeslot = 0;  glutTimerFunc(60, MyNightTimer, 1);
     }else if (entryID == 3) {
-        glClearColor(0, 0, 0, 0);   gBackground = 'R';  glutTimerFunc(400, MyTimer, 1);
+        glClearColor(0, 0, 0, 0);   gBackground = 'R';   gTimeslot = 0;  glutTimerFunc(400, MyRainTimer, 1);
     }
     glutPostRedisplay();
 }
 
-void MyTimer(int value) {
+
+void MyRainTimer(int value) {
     if (gBackground == 'R') {
         gTimeslot = (gTimeslot + 1) % 100;  // 0~99 반복
+//        std::cout << gTimeslot << std::endl;
         
         glutPostRedisplay();
-        glutTimerFunc(400, MyTimer, 1); // 중간에 메뉴가 day나 night로 바뀌면 타이머 종료
+        glutTimerFunc(400, MyRainTimer, 1); // 중간에 메뉴가 day나 night로 바뀌면 타이머 종료
     }
+}
+
+
+void MyNightTimer(int value) {
+    if (gBackground != 'N') return;
+    
+    gTimeslot = (gTimeslot + 1) % 120;  // 0~119 반복 (120 slot 동안 움직이는 애니메이션)
+    
+    /*########################
+      ### Maximus의 움직임 ###
+      ########################*/
+    
+    if (gTimeslot < 5) {
+        gY = 1; gFace = 's';
+        gRedforearm = 30; gBlackforearm = -30; gBlueleg = -19.5; gBlackleg = 19.5;  // jump
+    }else if (gTimeslot < 10) {
+        gY = 0;   gFace = 'u';
+        gRedforearm = 0; gBlackforearm = 0; gBlueleg = 0; gBlackleg = 0;    // down
+    }else if ((gTimeslot < 30) || (gTimeslot >= 70 && gTimeslot < 90)) {
+        if (gY == 0) {
+            gX -= 0.1;
+            if (gX < -1.5 || gX > 0.5)  gFace = 'a';
+            else    gFace = 'u';
+        }                                                                   // left (20 왼쪽, 40 오른쪽, 20 왼쪽)
+    }else if (gTimeslot < 70) {
+        if (gY == 0) {
+            gX += 0.1;
+            if (gX < -1.5 || gX > 0.5)   gFace = 'a';
+            else    gFace = 'u';
+        }                                                                   // right
+    }else if (gTimeslot == 90 || gTimeslot == 91 || gTimeslot == 94 || gTimeslot == 95) {
+        gShearLeg = 0.5;  gFace = 's'; gRedupperarm = 48; gBlackupperarm = -48; // 다리 왼쪽 전단
+    }else if (gTimeslot == 92 || gTimeslot == 93 || gTimeslot == 96 || gTimeslot == 97) {
+        gShearLeg = -0.5;  gFace = 's'; gRedupperarm = 48; gBlackupperarm = -48;    // 다리 오른쪽 전단
+    }else if (gTimeslot < 100) {
+        gShearLeg = 0.0;  gFace = 'u'; gRedupperarm = 0; gBlackupperarm = 0;    // 다리 원래대로
+    }else if (gTimeslot < 107) {
+        gShear = -0.5;  gFace = 's'; gRedupperarm = 48; gBlackupperarm = -48;   // 전체 왼쪽 전단
+    }else if (gTimeslot < 114) {
+        gShear = 0.5;  gFace = 's'; gRedupperarm = 48; gBlackupperarm = -48;    // 전체 오른쪽 전단
+    }else {
+        gShear = 0.0;  gFace = 'u'; gRedupperarm = 0; gBlackupperarm = 0;   // 전체 원상복귀
+    }
+    
+    
+    /*#######################
+      ### iPhone의 움직임 ###
+      #######################*/
+    
+    if (gTimeslot < 60) {
+        gPhoneX += 0.1;
+    }else {
+        gPhoneX -= 0.1;
+    }
+    
+    glutPostRedisplay();
+    glutTimerFunc(60, MyNightTimer, 1); // 중간에 메뉴가 day나 night로 바뀌면 타이머 종료
 }
 
 
